@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NX-API Sandbox</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="https://developer.cisco.com/site/sandbox/">NX-API Sandbox</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#search">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('commands') }}">Command Line</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Device Information Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Device Information Details</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                        {% for key, value in device_info.items() %}
+                            <tr>
+                                <th scope="row">{{ key }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Interface List Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>All Interface List</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Interface</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Protocol</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interface in interface_list %}
+                            <tr>
+                                <td>{{ interface['interface'] }}</td>
+                                <td>{{ interface['state'] }}</td>
+                                <td>{{ interface['state_rsn_desc'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Non-VLAN Interface Details Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Non-VLAN Interface Details</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Interface</th>
+                            <th scope="col">State</th>
+                            <th scope="col">Admin State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for iface, details in non_vlan_interface_details.items() %}
+                            <tr>
+                                <td>{{ details.interface }}</td>
+                                <td>{{ details.state }}</td>
+                                <td>{{ details.admin_state }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Search Interface Section -->
+        <div id="search" class="card mb-4">
+            <div class="card-header">
+                <h3>Search Interface</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('search_interface') }}#search">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="interface" name="interface" placeholder="Enter interface name (e.g., Ethernet1/1)" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-outline-primary">Search</button>
+                    </div>
+                </form>
+                {% if search_result %}
+                    <h4 class="mt-4">Search Result for {{ search_interface_name }}</h4>
+                    <pre class="mt-3">{{ search_result }}</pre>
+                {% endif %}
+            </div>
+        </div>        
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="loginSuccessModal" tabindex="-1" aria-labelledby="loginSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="loginSuccessModalLabel">Success</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <p>You have successfully logged in!</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        {% if login_success %}
+            var loginSuccessModal = new bootstrap.Modal(document.getElementById('loginSuccessModal'));
+            loginSuccessModal.show();
+        {% endif %}
+    </script>
+</body>
+</html>
